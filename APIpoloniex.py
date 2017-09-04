@@ -1,31 +1,36 @@
 #In English
-# # # The APIpoloniex class works with the API https://poloniex.com/ #
+#  The APIpoloniex class works with the API https://poloniex.com/ #
 #
 # This class has an error handler for poloniex requests, thanks to this
 # Your trading terminal will not hang for a long time.
-# #
+# 
 # If the query data, poloniex.com does not respond more timeOutSec seconds,
 # then the function returns -1 and an error message is displayed (APIerror)
-# #
+# 
 # The script is written for yourself, for trading on the stock exchange. Distributed without a license
-#
+
 #Для Русских
-# #			# Класс APIpoloniex работает с API https://poloniex.com/ #
+#  Класс APIpoloniex работает с API https://poloniex.com/ #
 #
 # В данный клас встроен обработчик ошибок на запросы к poloniex, благодаря этому
 # Ваш торговый терминал не будет зависать на длительное время.
-# # 
+#  
 # Если на запрос данных, poloniex.com не отвечает больше timeOutSec секунд, 
 # то функция возвращает -1 и выводится сообщение об ошибке (APIerror)
-# #
+# 
 # Скрипт написан для себя, для торговли на бирже. Распростроняется без лицензии
-#
-# #			# For Example #
+
+#For Example 
 #
 # from APIpoloniex import *
 # polo = APIpoloniex('api_key', 'api_secret',1.0)
 # print (polo.returnBalances())
-# #
+
+#Donate
+#
+# BTC fb0a34933ca0781f5e9917a52ea86d72cbb1c05b4ccfff56f9c78bdce5f8a573
+# LTC LRsm54XYJxG7NJCuAntK98odJoXhwp1GBK
+# ETH 0x8750793385349e2edd63e87d5c523b3b2c972b82
 
 
 import requests
