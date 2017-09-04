@@ -1,6 +1,10 @@
 # APIpoloniex
 Script for working in API poloniex
-
+```python
+from APIpoloniex import *
+polo = APIpoloniex(APIKey,Secret,[timeout_sec])
+print (polo.returnBalances())
+```
 ---
 in English
 
