@@ -3,6 +3,7 @@ Script for working in API poloniex
 
 ---
 in English
+
 Written on the basis of https://github.com/s4w3d0ff/python-poloniex
 
 The main differences from other poloniex scripts.  
@@ -10,6 +11,7 @@ The main differences from other poloniex scripts.
 
 ---
 по Русскии 
+
 Написан на основе https://github.com/s4w3d0ff/python-poloniex
 
 Самые главные отличия от других скриптов API poloniex.
