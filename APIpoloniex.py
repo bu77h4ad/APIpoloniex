@@ -79,7 +79,7 @@ class APIpoloniex(object):
 	def CommandPrivate(self,command="",args={},timeOutSec=False): #
 		if timeOutSec == False : timeOutSec= self.timeOutSec
 		args['command'] = command
-		args['nonce'] =  int(time.time()*1000000)		
+		args['nonce'] =  int(time.time()*1000000)			
 		url = "https://poloniex.com/tradingApi"
 		sign = new(
                 self.secret.encode('utf-8'),
@@ -132,11 +132,23 @@ class APIpoloniex(object):
 		return self.CommandPublic('returnChartData', args=agrs, timeOutSec=timeOutSec )
 
 ### PRIVATE COMMANDS-----------		
-#returnBalances Возвращает баланс
-	def returnBalances(self,timeOutSec = False):		
-		return self.CommandPrivate('returnBalances',timeOutSec = timeOutSec)
+# Returns all of your available balances. Sample output: {"BTC":"0.59098578","LTC":"3.31117268", ... }
+	def returnBalances(self, timeOutSec = False):		
+		return self.CommandPrivate('returnBalances', timeOutSec = timeOutSec)
 
-#returnTradeHistory возвращает историю моих сделок	
+# Returns all of your balances, including available balance, balance on orders, and the estimated BTC value of your balance.
+	def returnCompleteBalances(self, account='all', timeOutSec = False):
+		args = { 'account' : account }
+		return self.CommandPrivate('returnCompleteBalances', args = args, timeOutSec = timeOutSec)
+
+# Returns all of your deposit addresses. Sample output: {"BTC":"19YqztHmspv2egyD6jQM3yn81x5t5krVdJ","LTC
+	def returnDepositAddresses(self, timeOutSec = False):
+		return self.CommandPrivate('returnDepositAddresses', timeOutSec = timeOutSec)
+
+# Returns your trade history for a given market, specified by the "currencyPair" POST parameter.
+# You may specify "all" as the currencyPair to receive your trade history for all markets.
+# You may optionally specify a range via "start" and/or "end" POST parameters, given in UNIX timestamp format;
+# if you do not specify a range, it will be limited to one day. 
 	def returnTradeHistory(self,currencyPair='all', start=False, end=False, timeOutSec = False):
 		if start == False : start = time.time()- self.DAY
 		if end == False : end = time.time()
@@ -145,7 +157,9 @@ class APIpoloniex(object):
 				'end'	: end
 				}		
 		return self.CommandPrivate('returnTradeHistory', args=args, timeOutSec = timeOutSec)
-#BUY функция
+
+#BUY Places a limit buy order in a given market. Required POST parameters are "currencyPair", "rate", and "amount".
+# If successful, the method will return the order number
 	def buy(self, currencyPair, rate, amount, timeOutSec = False):
 		args = {
 		'currencyPair': str(currencyPair),
@@ -154,7 +168,7 @@ class APIpoloniex(object):
         }
 		return self.CommandPrivate('buy',args=args,timeOutSec = timeOutSec)
 
-#SELL Функция
+#SELL Places a sell order in a given market. Parameters and output are the same as for the buy method.
 	def sell(self, currencyPair, rate, amount, timeOutSec = False):
 		args = {
 		'currencyPair': str(currencyPair),
@@ -163,8 +177,15 @@ class APIpoloniex(object):
         }
 		return self.CommandPrivate('sell',args=args, timeOutSec = timeOutSec)
 
-#returnOpenOrders Возвращает Отррытые ордера
+# Cancels an order you have placed in a given market. 
+# Required POST parameter is "orderNumber". 
+# If successful, the method will return: {"success":1}
+	def cancelOrder(self, orderNumber, timeOutSec = False ):	
+		args= { 'orderNumber': orderNumber }
+		return 	self.CommandPrivate('cancelOrder',args=args, timeOutSec = timeOutSec)
+
+# Returns your open orders for a given market, specified by the "currencyPair" POST parameter, e.g. "BTC_XCP".
+# Set "currencyPair" to "all" to return open orders for all markets
 	def returnOpenOrders(self,currencyPair='all',timeOutSec = False):
 		args = { 'currencyPair': currencyPair }
 		return self.CommandPrivate('returnOpenOrders',args=args,timeOutSec = timeOutSec)
-
