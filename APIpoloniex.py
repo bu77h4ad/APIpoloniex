@@ -72,7 +72,7 @@ class APIpoloniex(object):
 		except:
 			self.APIerror(command,sys.exc_info()[1])
 			return -1
-		else:				
+		else:							
 			return html.json()
 
 #CommandPrivate для приватных команд
@@ -96,48 +96,26 @@ class APIpoloniex(object):
 			return -1	
 		else:				 
 			return  html.json()
-#BUY функция
-	def buy(self, currencyPair, rate, amount):
-		args = {
-		'currencyPair': str(currencyPair),
-		'rate': str(rate),
-		'amount': str(amount),
-        }
-		return self.CommandPrivate('buy',args)
-#SELL Функция
-	def sell(self, currencyPair, rate, amount):
-		args = {
-		'currencyPair': str(currencyPair),
-		'rate': str(rate),
-		'amount': str(amount),
-        }
-		return self.CommandPrivate('sell',args)
 
-#returnOpenOrders Возвращает Отррытые ордера
-	def returnOpenOrders(self,currencyPair='all'):
-		args = { 'currencyPair': currencyPair }
-		return self.CommandPrivate('returnOpenOrders',args)
-
-#returnBalances Возвращает баланс
-	def returnBalances(self):		
-		return self.CommandPrivate('returnBalances')
-
-#returnTradeHistory возвращает историю моих сделок	
-	def returnTradeHistory(self,currencyPair='all', start=False, end=False):
-		if start == False : start = time.time()- self.DAY
-		if end == False : end = time.time()
-		args = {'currencyPair':currencyPair,
-				'start'	: start,
-				'end'	: end
-				}		
-		return self.CommandPrivate('returnTradeHistory',args)
+### PUBLIC COMMANDS-----------
 
 #returnTicker текущее значения на бирже
-	def returnTicker(self):
-		return self.CommandPublic('returnTicker')
+	def returnTicker(self,timeOutSec = False):		
+		return self.CommandPublic('returnTicker', timeOutSec = timeOutSec)
+
+#return24hVolume возвращает значения за 24 часа
+	def return24hVolume(self,timeOutSec = False):				
+		return self.CommandPublic('return24hVolume', timeOutSec = timeOutSec)
+
+#returnOrderBook возвращает стакан цен
+	def returnOrderBook(self,currencyPair='all', timeOutSec=False):
+		args = { 
+			'currencyPair' : currencyPair
+		}
+		return self.CommandPublic('returnOrderBook',args = args , timeOutSec = timeOutSec)
 
 #returnChartData возвращает историю баров
-	def returnChartData(self, currencyPair, period=False, start=False, end=False):
+	def returnChartData(self, currencyPair, period=False, start=False, end=False, timeOutSec=False):
 
 		if period not in [300, 900, 1800, 7200, 14400, 86400]:
 			print ("%s invalid candle period" % str(period))
@@ -145,9 +123,48 @@ class APIpoloniex(object):
 			start = time.time() - self.DAY
 		if not end:
 			end = time.time()
-		return self.CommandPublic('returnChartData', {
+		agrs =  {
 			'currencyPair': str(currencyPair).upper(),
 			'period': str(period),
 			'start': str(start),
 			'end': str(end)
-        })
+        }
+		return self.CommandPublic('returnChartData', args=agrs, timeOutSec=timeOutSec )
+
+### PRIVATE COMMANDS-----------		
+#returnBalances Возвращает баланс
+	def returnBalances(self,timeOutSec = False):		
+		return self.CommandPrivate('returnBalances',timeOutSec = timeOutSec)
+
+#returnTradeHistory возвращает историю моих сделок	
+	def returnTradeHistory(self,currencyPair='all', start=False, end=False, timeOutSec = False):
+		if start == False : start = time.time()- self.DAY
+		if end == False : end = time.time()
+		args = {'currencyPair':currencyPair,
+				'start'	: start,
+				'end'	: end
+				}		
+		return self.CommandPrivate('returnTradeHistory', args=args, timeOutSec = timeOutSec)
+#BUY функция
+	def buy(self, currencyPair, rate, amount, timeOutSec = False):
+		args = {
+		'currencyPair': str(currencyPair),
+		'rate': str(rate),
+		'amount': str(amount),
+        }
+		return self.CommandPrivate('buy',args=args,timeOutSec = timeOutSec)
+
+#SELL Функция
+	def sell(self, currencyPair, rate, amount, timeOutSec = False):
+		args = {
+		'currencyPair': str(currencyPair),
+		'rate': str(rate),
+		'amount': str(amount),
+        }
+		return self.CommandPrivate('sell',args=args, timeOutSec = timeOutSec)
+
+#returnOpenOrders Возвращает Отррытые ордера
+	def returnOpenOrders(self,currencyPair='all',timeOutSec = False):
+		args = { 'currencyPair': currencyPair }
+		return self.CommandPrivate('returnOpenOrders',args=args,timeOutSec = timeOutSec)
+
