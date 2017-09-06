@@ -71,6 +71,7 @@ class APIpoloniex(object):
 				arg = { 'currencyPair' = 'BTC_SC'} 
 				timeOutSec = 3.0"""
 		if timeOutSec == False : timeOutSec= self.timeOutSec
+
 		url = 'https://poloniex.com/public?command=' + command
 		if args.get("currencyPair"): url= url +"&currencyPair=" + args['currencyPair'].upper()			
 		if args.get("period"): url= url +"&period=" + args['period']	
@@ -136,7 +137,22 @@ class APIpoloniex(object):
 		args = { 
 			'currencyPair' : currencyPair
 		}
-		return self.CommandPublic('returnOrderBook',args = args , timeOutSec = timeOutSec)
+		return self.CommandPublic('returnOrderBook', args = args , timeOutSec = timeOutSec)
+
+	def returnTradersHistory(self, currencyPair, start=False, end=False, timeOutSec=False):
+		""" Returns the past 200 trades for a given market, or up to 50,000 trades between a range specified 
+		in UNIX timestamps by the "start" and "end" GET parameters. 
+		Sample output:
+		[{"date":"2014-02-10 04:23:23","type":"buy","rate":"0.00007600","amount":"140","total":"0.01064"},
+		{"date":"2014-02-10 01:19:37","type":"buy","rate":"0.00007600","amount":"655","total":"0.04978"}, ... ] """
+		if start == False : start = time.time() - self.DAY
+		if end == False : end = time.time()
+		args = {
+			'currencyPair' : str(currencyPair),
+			'start' : str(start),
+			'end' : str(end)
+		}
+		return self.CommandPublic('returnTradeHistory', args = args , timeOutSec = timeOutSec)
 
 	def returnChartData(self, currencyPair, period=False, start=False, end=False, timeOutSec=False):
 		""" Returns candlestick chart data. Required GET parameters are "currencyPair", "period" (candlestick period in seconds; 
@@ -195,10 +211,10 @@ class APIpoloniex(object):
 		"type": "sell", "category": "marginTrade" }, ... ],"BTC_LTC":[ ... ] ... }"""
 		if start == False : start = time.time() - self.DAY
 		if end == False : end = time.time()
-		args = {'currencyPair':currencyPair,
-				'start'	: start,
-				'end'	: end
-				}		
+		args = { 'currencyPair': str(currencyPair),
+				 'start'	: str(start),
+				 'end'	: str(end)
+				 }		
 		return self.CommandPrivate('returnTradeHistory', args=args, timeOutSec = timeOutSec)
 
 	def buy(self, currencyPair, rate, amount, timeOutSec = False):
@@ -216,9 +232,9 @@ class APIpoloniex(object):
 		{"orderNumber":31226040,"resultingTrades":[{"amount":"338.8732","date":"2014-10-18 23:03:21","rate":"0.00000173",
 		"total":"0.00058625","tradeID":"16164","type":"buy"}]}"""
 		args = {
-		'currencyPair': str(currencyPair),
-		'rate': str(rate),
-		'amount': str(amount),
+			'currencyPair': str(currencyPair),
+			'rate': str(rate),
+			'amount': str(amount),
         }
 		return self.CommandPrivate('buy', args=args, timeOutSec = timeOutSec)
 
@@ -226,9 +242,9 @@ class APIpoloniex(object):
 		""" Places a sell order in a given market. Parameters and output are
         the same as for the buy method. """
 		args = {
-		'currencyPair': str(currencyPair),
-		'rate': str(rate),
-		'amount': str(amount),
+			'currencyPair': str(currencyPair),
+			'rate': str(rate),
+			'amount': str(amount),
         }
 		return self.CommandPrivate('sell',args=args, timeOutSec = timeOutSec)
 
