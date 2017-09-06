@@ -107,25 +107,34 @@ class APIpoloniex(object):
 # --PUBLIC COMMANDS-------------------------------------------------------
 
 	def returnTicker(self,timeOutSec = False):	
-		""" Returns the ticker for all markets. """	
+		""" Returns the ticker for all markets. Sample output:
+		{"BTC_LTC":{"last":"0.0251","lowestAsk":"0.02589999","highestBid":"0.0251","percentChange":"0.02390438",
+		"baseVolume":"6.16485315","quoteVolume":"245.82513926"},"BTC_NXT":{"last":"0.00005730","lowestAsk":"0.00005710",
+		"highestBid":"0.00004903","percentChange":"0.16701570","baseVolume":"0.45347489","quoteVolume":"9094"}, ... } """	
 		return self.CommandPublic('returnTicker', timeOutSec = timeOutSec)
 
 	def return24hVolume(self,timeOutSec = False):
-		""" Returns the 24-hour volume for all markets,
-        plus totals for primary currencies. """				
+		""" Returns the 24-hour volume for all markets, plus totals for primary currencies. Sample output:
+		{"BTC_LTC":{"BTC":"2.23248854","LTC":"87.10381314"},"BTC_NXT":{"BTC":"0.981616","NXT":"14145"}, ... 
+		"totalBTC":"81.89657704","totalLTC":"78.52083806"} """				
 		return self.CommandPublic('return24hVolume', timeOutSec = timeOutSec)
 
 	def returnOrderBook(self,currencyPair='all', timeOutSec=False):
-		""" Returns the order book for a given market as well as a sequence
-        number for use with the Push API and an indicator specifying whether the
-        market is frozen. (defaults to 'all' markets, at a 'depth' of 20 orders) """
+		""" Returns the order book for a given market, as well as a sequence number for use with the Push API 
+		and an indicator specifying whether the market is frozen. You may set currencyPair to "all" 
+		to get the order books of all markets. Sample output:
+		{"asks":[[0.00007600,1164],[0.00007620,1300], ... ], "bids":[[0.00006901,200],[0.00006900,408], ... ], "isFrozen": 0, "seq": 18849} """
 		args = { 
 			'currencyPair' : currencyPair
 		}
 		return self.CommandPublic('returnOrderBook',args = args , timeOutSec = timeOutSec)
 
 	def returnChartData(self, currencyPair, period=False, start=False, end=False, timeOutSec=False):
-		""" Returns information about all currencies. """
+		""" Returns candlestick chart data. Required GET parameters are "currencyPair", "period" (candlestick period in seconds; 
+		valid values are 300, 900, 1800, 7200, 14400, and 86400), "start", and "end". "Start" and "end" are given in UNIX timestamp
+		format and used to specify the date range for the data returned. Sample output:
+		[{"date":1405699200,"high":0.0045388,"low":0.00403001,"open":0.00404545,"close":0.00427592,"volume":44.11655644,
+		"quoteVolume":10259.29079097,"weightedAverage":0.00430015}, ...] """
 		if period not in [300, 900, 1800, 7200, 14400, 86400]:
 			print ("%s invalid candle period" % str(period))
 		if not start:
