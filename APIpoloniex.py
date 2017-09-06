@@ -107,14 +107,16 @@ class APIpoloniex(object):
 # --PUBLIC COMMANDS-------------------------------------------------------
 
 	def returnTicker(self,timeOutSec = False):	
-		""" Returns the ticker for all markets. Sample output:
+		""" Returns the ticker for all markets. 
+		Sample output:
 		{"BTC_LTC":{"last":"0.0251","lowestAsk":"0.02589999","highestBid":"0.0251","percentChange":"0.02390438",
 		"baseVolume":"6.16485315","quoteVolume":"245.82513926"},"BTC_NXT":{"last":"0.00005730","lowestAsk":"0.00005710",
 		"highestBid":"0.00004903","percentChange":"0.16701570","baseVolume":"0.45347489","quoteVolume":"9094"}, ... } """	
 		return self.CommandPublic('returnTicker', timeOutSec = timeOutSec)
 
 	def return24hVolume(self,timeOutSec = False):
-		""" Returns the 24-hour volume for all markets, plus totals for primary currencies. Sample output:
+		""" Returns the 24-hour volume for all markets, plus totals for primary currencies. 
+		Sample output:
 		{"BTC_LTC":{"BTC":"2.23248854","LTC":"87.10381314"},"BTC_NXT":{"BTC":"0.981616","NXT":"14145"}, ... 
 		"totalBTC":"81.89657704","totalLTC":"78.52083806"} """				
 		return self.CommandPublic('return24hVolume', timeOutSec = timeOutSec)
@@ -122,7 +124,8 @@ class APIpoloniex(object):
 	def returnOrderBook(self,currencyPair='all', timeOutSec=False):
 		""" Returns the order book for a given market, as well as a sequence number for use with the Push API 
 		and an indicator specifying whether the market is frozen. You may set currencyPair to "all" 
-		to get the order books of all markets. Sample output:
+		to get the order books of all markets. 
+		Sample output:
 		{"asks":[[0.00007600,1164],[0.00007620,1300], ... ], "bids":[[0.00006901,200],[0.00006900,408], ... ], "isFrozen": 0, "seq": 18849} """
 		args = { 
 			'currencyPair' : currencyPair
@@ -132,7 +135,8 @@ class APIpoloniex(object):
 	def returnChartData(self, currencyPair, period=False, start=False, end=False, timeOutSec=False):
 		""" Returns candlestick chart data. Required GET parameters are "currencyPair", "period" (candlestick period in seconds; 
 		valid values are 300, 900, 1800, 7200, 14400, and 86400), "start", and "end". "Start" and "end" are given in UNIX timestamp
-		format and used to specify the date range for the data returned. Sample output:
+		format and used to specify the date range for the data returned. 
+		Sample output:
 		[{"date":1405699200,"high":0.0045388,"low":0.00403001,"open":0.00404545,"close":0.00427592,"volume":44.11655644,
 		"quoteVolume":10259.29079097,"weightedAverage":0.00430015}, ...] """
 		if period not in [300, 900, 1800, 7200, 14400, 86400]:
@@ -152,14 +156,18 @@ class APIpoloniex(object):
  # --PRIVATE COMMANDS------------------------------------------------------	
 
 	def returnBalances(self, timeOutSec = False):		
-		""" Returns all of your available balances. Sample output: {"BTC":"0.59098578","LTC":"3.31117268", ... } """
+		""" Returns all of your available balances. 
+		Sample output: 
+		{"BTC":"0.59098578","LTC":"3.31117268", ... } """
 		return self.CommandPrivate('returnBalances', timeOutSec = timeOutSec)
 
 	def returnCompleteBalances(self, account='all', timeOutSec = False):
 		""" Returns all of your balances, including available balance, balance
         on orders, and the estimated BTC value of your balance. By default,
         this call is limited to your exchange account; set the "account"
-        parameter to "all" to include your margin and lending accounts. """
+        parameter to "all" to include your margin and lending accounts. 
+        Sample output:
+        {"LTC":{"available":"5.015","onOrders":"1.0025","btcValue":"0.078"},"NXT:{...} ... }"""
 		args = { 'account' : account }
 		return self.CommandPrivate('returnCompleteBalances', args = args, timeOutSec = timeOutSec)
 
@@ -172,8 +180,13 @@ class APIpoloniex(object):
         "currencyPair" parameter. You may specify "all" as the currencyPair to
         receive your trade history for all markets. You may optionally specify
         a range via "start" and/or "end" POST parameters, given in UNIX
-        timestamp format; if you do not specify a range, it will be limited to
-        one day. """
+        timestamp format; if you do not specify a range, it will be limited to one day. 
+        Sample output:
+		{"BTC_MAID": [ { "globalTradeID": 29251512, "tradeID": "1385888", "date": "2016-05-03 01:29:55", "rate": "0.00014243",
+		"amount": "353.74692925", "total": "0.05038417", "fee": "0.00200000", "orderNumber": "12603322113", "type": "buy", 
+		"category": "settlement" }, { "globalTradeID": 29251511, "tradeID": "1385887", "date": "2016-05-03 01:29:55", 
+		"rate": "0.00014111", "amount": "311.24262497", "total": "0.04391944", "fee": "0.00200000", "orderNumber": "12603319116", 
+		"type": "sell", "category": "marginTrade" }, ... ],"BTC_LTC":[ ... ] ... }"""
 		if start == False : start = time.time() - self.DAY
 		if end == False : end = time.time()
 		args = {'currencyPair':currencyPair,
@@ -192,7 +205,10 @@ class APIpoloniex(object):
         canceled rather than left on the order book. A post-only order will
         only be placed if no portion of it fills immediately; this guarantees
         you will never pay the taker fee on any part of the order that fills.
-        If successful, the method will return the order number. """
+        If successful, the method will return the order number.
+        Sample output:
+		{"orderNumber":31226040,"resultingTrades":[{"amount":"338.8732","date":"2014-10-18 23:03:21","rate":"0.00000173",
+		"total":"0.00058625","tradeID":"16164","type":"buy"}]}"""
 		args = {
 		'currencyPair': str(currencyPair),
 		'rate': str(rate),
@@ -212,13 +228,17 @@ class APIpoloniex(object):
 
 	def cancelOrder(self, orderNumber, timeOutSec = False ):	
 		""" Cancels an order you have placed in a given market. Required
-        parameter is "orderNumber". If successful, the method will return: {"success":1} """
+        parameter is "orderNumber". If successful, the method will return:
+        {"success":1} """
 		args= { 'orderNumber': orderNumber }
 		return 	self.CommandPrivate('cancelOrder',args=args, timeOutSec = timeOutSec)
 
 	def returnOpenOrders(self,currencyPair='all',timeOutSec = False):
 		""" Returns your open orders for a given market, specified by the
 		"currencyPair" parameter, e.g. "BTC_XCP". Set "currencyPair" to
-		"all" to return open orders for all markets. """
+		"all" to return open orders for all markets.
+		Sample output for single market:
+		[{"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5"},
+		{"orderNumber":"120467","type":"sell","rate":"0.04","amount":"100","total":"4"}, ... ] """
 		args = { 'currencyPair': currencyPair }
 		return self.CommandPrivate('returnOpenOrders',args=args,timeOutSec = timeOutSec)
