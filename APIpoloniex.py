@@ -33,21 +33,23 @@
 # ETH 0x8750793385349e2edd63e87d5c523b3b2c972b82
 
 
-import requests
+import requests  
 from urllib.parse import urlencode 
 import json 
 from hmac import new 
 from hashlib import sha512 
 import sys
 import time
+import logging 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s : %(message)s',filename = "log.txt", filemode = 'w') 
 
-class APIpoloniex(object):	
-	"""
-	key = str api key supplied by Poloniex
-	secret = str secret hash supplied by Poloniex
-	timeout = int time in sec to wait for an api response
-	"""       
+class APIpoloniex(object):		       
 	def __init__(self,APIKey,secret,timeOutSec=3.0):
+		"""
+		key = str api key supplied by Poloniex
+		secret = str secret hash supplied by Poloniex
+		timeout = int time in sec to wait for an api response
+		"""
 		self.APIKey=APIKey
 		self.secret=secret
 		self.timeOutSec= timeOutSec
@@ -57,16 +59,17 @@ class APIpoloniex(object):
 		self.YEAR = self.DAY * 365
 		return
 
-#APIerror Вывод ошибок	
-	def APIerror(self,command, info):
+	def __APIerror(self,command, info):
 		""" Exception for handling poloniex api errors """
-		print( "\n"+time.strftime("[%H:%M:%S]")+" Error while executing the command: " + "\"" +command + "\"")
-		print(time.strftime("[%H:%M:%S]"),info)
+		logging.error(' Error while executing the command ' + '\"' +command + '\" : ' + info ) 		
 		return
 
-#CommandPublic для публичных команд
 	def CommandPublic (self, command, args={}, timeOutSec=False):
-		"""  """
+		""" Handler for public commands
+			For Example:
+				command  = 'returnOrderBook'
+				arg = { 'currencyPair' = 'BTC_SC'} 
+				timeOutSec = 3.0"""
 		if timeOutSec == False : timeOutSec= self.timeOutSec
 		url = 'https://poloniex.com/public?command=' + command
 		if args.get("currencyPair"): url= url +"&currencyPair=" + args['currencyPair'].upper()			
@@ -76,14 +79,17 @@ class APIpoloniex(object):
 		try:
 			html = requests.get(url,timeout=(timeOutSec,timeOutSec))
 		except:
-			self.APIerror(command,sys.exc_info()[1])
+			self.__APIerror(command,sys.exc_info()[1])
 			return -1
 		else:							
 			return html.json()
 
-#CommandPrivate для приватных команд		
-	def CommandPrivate(self,command="",args={},timeOutSec=False):
-		"""  """
+	def CommandPrivate(self,command ,args={},timeOutSec=False):
+		""" Handler for private commands
+			For Example:
+				command  = 'returnOrderBook'
+				arg = { 'returnCompleteBalances' = 'all'} 
+				timeOutSec = 3.0"""
 		if timeOutSec == False : timeOutSec= self.timeOutSec
 		args['command'] = command
 		args['nonce'] =  int(time.time()*1000000)			
@@ -99,14 +105,14 @@ class APIpoloniex(object):
 		try:
 			html = requests.post(url, data=args, headers=headers,timeout=(timeOutSec, timeOutSec))
 		except:
-			self.APIerror(command,sys.exc_info()[1])
+			self.__APIerror(command,sys.exc_info()[1])
 			return -1	
 		else:				 
 			return  html.json()
 
 # --PUBLIC COMMANDS-------------------------------------------------------
 
-	def returnTicker(self,timeOutSec = False):	
+	def returnTicker(self, timeOutSec = False):	
 		""" Returns the ticker for all markets. 
 		Sample output:
 		{"BTC_LTC":{"last":"0.0251","lowestAsk":"0.02589999","highestBid":"0.0251","percentChange":"0.02390438",
@@ -114,14 +120,14 @@ class APIpoloniex(object):
 		"highestBid":"0.00004903","percentChange":"0.16701570","baseVolume":"0.45347489","quoteVolume":"9094"}, ... } """	
 		return self.CommandPublic('returnTicker', timeOutSec = timeOutSec)
 
-	def return24hVolume(self,timeOutSec = False):
+	def return24hVolume(self, timeOutSec = False):
 		""" Returns the 24-hour volume for all markets, plus totals for primary currencies. 
 		Sample output:
 		{"BTC_LTC":{"BTC":"2.23248854","LTC":"87.10381314"},"BTC_NXT":{"BTC":"0.981616","NXT":"14145"}, ... 
 		"totalBTC":"81.89657704","totalLTC":"78.52083806"} """				
 		return self.CommandPublic('return24hVolume', timeOutSec = timeOutSec)
 
-	def returnOrderBook(self,currencyPair='all', timeOutSec=False):
+	def returnOrderBook(self, currencyPair='all', timeOutSec=False):
 		""" Returns the order book for a given market, as well as a sequence number for use with the Push API 
 		and an indicator specifying whether the market is frozen. You may set currencyPair to "all" 
 		to get the order books of all markets. 
@@ -175,7 +181,7 @@ class APIpoloniex(object):
 		""" Returns all of your deposit addresses. Sample output: {"BTC":"19YqztHmspv2egyD6jQM3yn81x5t5krVdJ","LTC """
 		return self.CommandPrivate('returnDepositAddresses', timeOutSec = timeOutSec)
 
-	def returnTradeHistory(self,currencyPair='all', start=False, end=False, timeOutSec = False):
+	def returnTradeHistory(self, currencyPair='all', start=False, end=False, timeOutSec = False):
 		""" Returns your trade history for a given market, specified by the
         "currencyPair" parameter. You may specify "all" as the currencyPair to
         receive your trade history for all markets. You may optionally specify
@@ -214,7 +220,7 @@ class APIpoloniex(object):
 		'rate': str(rate),
 		'amount': str(amount),
         }
-		return self.CommandPrivate('buy',args=args,timeOutSec = timeOutSec)
+		return self.CommandPrivate('buy', args=args, timeOutSec = timeOutSec)
 
 	def sell(self, currencyPair, rate, amount, timeOutSec = False):
 		""" Places a sell order in a given market. Parameters and output are
@@ -231,9 +237,9 @@ class APIpoloniex(object):
         parameter is "orderNumber". If successful, the method will return:
         {"success":1} """
 		args= { 'orderNumber': orderNumber }
-		return 	self.CommandPrivate('cancelOrder',args=args, timeOutSec = timeOutSec)
+		return 	self.CommandPrivate('cancelOrder', args=args, timeOutSec = timeOutSec)
 
-	def returnOpenOrders(self,currencyPair='all',timeOutSec = False):
+	def returnOpenOrders(self, currencyPair='all', timeOutSec = False):
 		""" Returns your open orders for a given market, specified by the
 		"currencyPair" parameter, e.g. "BTC_XCP". Set "currencyPair" to
 		"all" to return open orders for all markets.
@@ -241,4 +247,4 @@ class APIpoloniex(object):
 		[{"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5"},
 		{"orderNumber":"120467","type":"sell","rate":"0.04","amount":"100","total":"4"}, ... ] """
 		args = { 'currencyPair': currencyPair }
-		return self.CommandPrivate('returnOpenOrders',args=args,timeOutSec = timeOutSec)
+		return self.CommandPrivate('returnOpenOrders', args=args, timeOutSec = timeOutSec)
