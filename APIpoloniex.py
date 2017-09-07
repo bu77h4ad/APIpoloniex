@@ -41,7 +41,8 @@ from hashlib import sha512
 import sys
 import time
 import logging 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s : %(message)s',filename = "log.txt", filemode = 'w') 
+
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s : %(message)s',filename = "log.txt", filemode = 'w') 
 
 class APIpoloniex(object):		       
 	def __init__(self,APIKey,secret,timeOutSec=3.0):
@@ -61,7 +62,7 @@ class APIpoloniex(object):
 
 	def __APIerror(self,command, info):
 		""" Exception for handling poloniex api errors """
-		logging.error(' Error while executing the command ' + '\"' +command + '\" : ' + info ) 		
+		logging.error('\"' +str(command) + '\" : ' + str(info) ) 		
 		return
 
 	def CommandPublic (self, command, args={}, timeOutSec=False):
@@ -197,12 +198,14 @@ class APIpoloniex(object):
 		""" Returns all of your deposit addresses. Sample output: {"BTC":"19YqztHmspv2egyD6jQM3yn81x5t5krVdJ","LTC """
 		return self.CommandPrivate('returnDepositAddresses', timeOutSec = timeOutSec)
 
-	def returnTradeHistory(self, currencyPair='all', start=False, end=False, timeOutSec = False):
+	def returnTradeHistory(self, currencyPair='all', start=False, end=False, limit=False, timeOutSec = False):
 		""" Returns your trade history for a given market, specified by the
         "currencyPair" parameter. You may specify "all" as the currencyPair to
         receive your trade history for all markets. You may optionally specify
         a range via "start" and/or "end" POST parameters, given in UNIX
         timestamp format; if you do not specify a range, it will be limited to one day. 
+        You may optionally limit the number of entries returned using the "limit" parameter,
+         up to a maximum of 10,000. If the "limit" parameter is not specified, no more than 500 entries will be returned.
         Sample output:
 		{"BTC_MAID": [ { "globalTradeID": 29251512, "tradeID": "1385888", "date": "2016-05-03 01:29:55", "rate": "0.00014243",
 		"amount": "353.74692925", "total": "0.05038417", "fee": "0.00200000", "orderNumber": "12603322113", "type": "buy", 
@@ -213,7 +216,8 @@ class APIpoloniex(object):
 		if end == False : end = time.time()
 		args = { 'currencyPair': str(currencyPair),
 				 'start'	: str(start),
-				 'end'	: str(end)
+				 'end'	: str(end),
+				 'limit' : str(limit)
 				 }		
 		return self.CommandPrivate('returnTradeHistory', args=args, timeOutSec = timeOutSec)
 
