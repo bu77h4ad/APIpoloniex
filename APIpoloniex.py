@@ -95,7 +95,7 @@ class APIpoloniex(object):
 		if timeOutSec == False : timeOutSec= self.timeOutSec
 		args['command'] = command
 		args['nonce'] =  int(time.time()*1000000)			
-		url = "https://poloniex.com/tradingApi"
+		url = "https://poloniex.com/tradingApi"		
 		sign = new(
                 self.secret.encode('utf-8'),
                 urlencode(args).encode('utf-8'),
@@ -198,7 +198,7 @@ class APIpoloniex(object):
 		""" Returns all of your deposit addresses. Sample output: {"BTC":"19YqztHmspv2egyD6jQM3yn81x5t5krVdJ","LTC """
 		return self.CommandPrivate('returnDepositAddresses', timeOutSec = timeOutSec)
 
-	def returnTradeHistory(self, currencyPair='all', start=False, end=False, limit=False, timeOutSec = False):
+	def returnTradeHistory(self, currencyPair='all', start=False, end=False, limit=10000, timeOutSec = False):
 		""" Returns your trade history for a given market, specified by the
         "currencyPair" parameter. You may specify "all" as the currencyPair to
         receive your trade history for all markets. You may optionally specify
