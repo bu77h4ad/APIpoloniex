@@ -67,7 +67,7 @@ class APIpoloniex(object):
 
 	def CommandPublic (self, command, args={}, timeOutSec=False):
 		""" Handler for public commands
-			For Example:
+			Example:
 				command  = 'returnOrderBook'
 				arg = { 'currencyPair' = 'BTC_SC'} 
 				timeOutSec = 3.0"""
@@ -88,7 +88,7 @@ class APIpoloniex(object):
 
 	def CommandPrivate(self,command ,args={},timeOutSec=False):
 		""" Handler for private commands
-			For Example:
+			Example:
 				command  = 'returnOrderBook'
 				arg = { 'returnCompleteBalances' = 'all'} 
 				timeOutSec = 3.0"""
@@ -97,13 +97,13 @@ class APIpoloniex(object):
 		args['nonce'] =  int(time.time()*1000000)			
 		url = "https://poloniex.com/tradingApi"		
 		sign = new(
-                self.secret.encode('utf-8'),
-                urlencode(args).encode('utf-8'),
-                sha512).hexdigest()
+			self.secret.encode('utf-8'),
+            urlencode(args).encode('utf-8'),
+            sha512).hexdigest()
 		headers = {
-		'Key' : self.APIKey,
-		'Sign' :sign,
-		}    
+			'Key' 	: self.APIKey,
+			'Sign' 	: sign,
+			}    
 		try:
 			html = requests.post(url, data=args, headers=headers,timeout=(timeOutSec, timeOutSec))
 		except:
@@ -137,7 +137,7 @@ class APIpoloniex(object):
 		{"asks":[[0.00007600,1164],[0.00007620,1300], ... ], "bids":[[0.00006901,200],[0.00006900,408], ... ], "isFrozen": 0, "seq": 18849} """
 		args = { 
 			'currencyPair' : currencyPair
-		}
+			}
 		return self.CommandPublic('returnOrderBook', args = args , timeOutSec = timeOutSec)
 
 	def returnTradersHistory(self, currencyPair, start=False, end=False, timeOutSec=False):
@@ -151,8 +151,8 @@ class APIpoloniex(object):
 		args = {
 			'currencyPair' : str(currencyPair),
 			'start' : str(start),
-			'end' : str(end)
-		}
+			'end'	 : str(end)
+			}
 		return self.CommandPublic('returnTradeHistory', args = args , timeOutSec = timeOutSec)
 
 	def returnChartData(self, currencyPair, period=False, start=False, end=False, timeOutSec=False):
@@ -171,9 +171,9 @@ class APIpoloniex(object):
 		agrs =  {
 			'currencyPair': str(currencyPair).upper(),
 			'period': str(period),
-			'start': str(start),
-			'end': str(end)
-                }
+			'start'	: str(start),
+			'end'	: str(end)
+           	}
 		return self.CommandPublic('returnChartData', args=agrs, timeOutSec=timeOutSec )
 
  # --PRIVATE COMMANDS------------------------------------------------------	
@@ -191,7 +191,9 @@ class APIpoloniex(object):
         parameter to "all" to include your margin and lending accounts. 
         Sample output:
         {"LTC":{"available":"5.015","onOrders":"1.0025","btcValue":"0.078"},"NXT:{...} ... }"""
-		args = { 'account' : account }
+		args = { 
+			'account' : account 
+			}
 		return self.CommandPrivate('returnCompleteBalances', args = args, timeOutSec = timeOutSec)
 
 	def returnDepositAddresses(self, timeOutSec = False):
@@ -214,11 +216,12 @@ class APIpoloniex(object):
 		"type": "sell", "category": "marginTrade" }, ... ],"BTC_LTC":[ ... ] ... }"""
 		if start == False : start = time.time() - self.DAY
 		if end == False : end = time.time()
-		args = { 'currencyPair': str(currencyPair),
-				 'start'	: str(start),
-				 'end'	: str(end),
-				 'limit' : str(limit)
-				 }		
+		args = { 
+			'currencyPair': str(currencyPair),
+			'start'	: str(start),
+			'end'	: str(end),
+			'limit' : str(limit)
+			}		
 		return self.CommandPrivate('returnTradeHistory', args=args, timeOutSec = timeOutSec)
 
 	def buy(self, currencyPair, rate, amount, timeOutSec = False):
@@ -237,9 +240,9 @@ class APIpoloniex(object):
 		"total":"0.00058625","tradeID":"16164","type":"buy"}]}"""
 		args = {
 			'currencyPair': str(currencyPair),
-			'rate': str(rate),
+			'rate'	: str(rate),
 			'amount': str(amount),
-        }
+        	}
 		return self.CommandPrivate('buy', args=args, timeOutSec = timeOutSec)
 
 	def sell(self, currencyPair, rate, amount, timeOutSec = False):
@@ -247,16 +250,18 @@ class APIpoloniex(object):
         the same as for the buy method. """
 		args = {
 			'currencyPair': str(currencyPair),
-			'rate': str(rate),
+			'rate'	: str(rate),
 			'amount': str(amount),
-        }
+        	}
 		return self.CommandPrivate('sell',args=args, timeOutSec = timeOutSec)
 
 	def cancelOrder(self, orderNumber, timeOutSec = False ):	
 		""" Cancels an order you have placed in a given market. Required
         parameter is "orderNumber". If successful, the method will return:
         {"success":1} """
-		args= { 'orderNumber': orderNumber }
+		args= { 
+			'orderNumber': orderNumber 
+			}
 		return 	self.CommandPrivate('cancelOrder', args=args, timeOutSec = timeOutSec)
 
 	def returnOpenOrders(self, currencyPair='all', timeOutSec = False):
@@ -266,5 +271,7 @@ class APIpoloniex(object):
 		Sample output for single market:
 		[{"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5"},
 		{"orderNumber":"120467","type":"sell","rate":"0.04","amount":"100","total":"4"}, ... ] """
-		args = { 'currencyPair': currencyPair }
+		args = { 
+			'currencyPair': currencyPair 
+			}
 		return self.CommandPrivate('returnOpenOrders', args=args, timeOutSec = timeOutSec)
