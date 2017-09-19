@@ -42,7 +42,7 @@ import sys
 import time
 import logging 
 
-logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s : %(message)s',filename = "log.txt", filemode = 'w') 
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s : %(message)s', filename = "log.txt", filemode = 'w') 
 
 class APIpoloniex(object):		       
 	def __init__(self,APIKey,secret,timeOutSec=3.0):
@@ -60,10 +60,16 @@ class APIpoloniex(object):
 		self.YEAR = self.DAY * 365
 		return
 
-	def __APIerror(self,command, info):
+	def __APIerror(self,command = 0, info = 0, html = 0):
 		""" Exception for handling poloniex api errors """
-		logging.error('\"' +str(command) + '\" : ' + str(info) ) 		
-		return
+		#print (html.json(),'HTML!!!')
+		if html == 0 :
+			logging.error('\"' +str(command) + '\" : ' + str(info) ) 		
+			return
+		if 'error' in html.json():			
+			logging.error('\"' +str(command) + '\" : ' +html.json()['error'] ) 	
+			return -1	
+		return html.json()
 
 	def CommandPublic (self, command, args={}, timeOutSec=False):
 		""" Handler for public commands
@@ -81,10 +87,10 @@ class APIpoloniex(object):
 		try:
 			html = requests.get(url,timeout=(timeOutSec,timeOutSec))
 		except:
-			self.__APIerror(command,sys.exc_info()[1])
+			self.__APIerror(command = command, info = sys.exc_info()[1])
 			return -1
-		else:							
-			return html.json()
+		else :
+			return self.__APIerror(command = command, html =html)
 
 	def CommandPrivate(self,command ,args={},timeOutSec=False):
 		""" Handler for private commands
@@ -107,10 +113,10 @@ class APIpoloniex(object):
 		try:
 			html = requests.post(url, data=args, headers=headers,timeout=(timeOutSec, timeOutSec))
 		except:
-			self.__APIerror(command,sys.exc_info()[1])
+			self.__APIerror(command = command, info = sys.exc_info()[1])
 			return -1	
 		else:				 
-			return  html.json()
+			return  self.__APIerror(command = command, html = html)
 
 # --PUBLIC COMMANDS-------------------------------------------------------
 
@@ -176,10 +182,10 @@ class APIpoloniex(object):
            	}
 		return self.CommandPublic('returnChartData', args=agrs, timeOutSec=timeOutSec )
 
- # --PRIVATE COMMANDS------------------------------------------------------	
+# --PRIVATE COMMANDS------------------------------------------------------
 
-	def returnBalances(self, timeOutSec = False):		
-		""" Returns all of your available balances. 
+	def returnBalances(self, timeOutSec = False):				
+		"""Returns all of your available balances. 
 		Sample output: 
 		{"BTC":"0.59098578","LTC":"3.31117268", ... } """
 		return self.CommandPrivate('returnBalances', timeOutSec = timeOutSec)
