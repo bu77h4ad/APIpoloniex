@@ -64,10 +64,10 @@ class APIpoloniex(object):
 		""" Exception for handling poloniex api errors """
 		#print (html.json(),'HTML!!!')
 		if html == 0 :
-			logging.error('\"' +str(command) + '\" : ' + str(info) ) 		
+			logging.error('\"' + str(command) + '\" : ' + str(info) ) 		
 			return
-		if 'error' in html.json():			
-			logging.error('\"' +str(command) + '\" : ' +html.json()['error'] ) 	
+		elif 'error' in html.text:			
+			logging.error('\"' + str(command) + '\" : ' + html.text ) 	
 			return -1	
 		return html.json()
 
