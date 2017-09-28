@@ -32,7 +32,6 @@
 # LTC LRsm54XYJxG7NJCuAntK98odJoXhwp1GBK
 # ETH 0x8750793385349e2edd63e87d5c523b3b2c972b82
 
-
 import requests  
 from urllib.parse import urlencode 
 import json 
@@ -42,10 +41,15 @@ import sys
 import time
 import logging 
 
-logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s : %(message)s', filename = "log.txt", filemode = 'w') 
+logging.basicConfig(
+	level = logging.WARNING, 
+	format = '[LINE:%(lineno)d] %(asctime)s %(levelname)s : %(message)s', 
+	filename = 'AliceLog.log', 
+	filemode = 'w'
+	) 
 
 class APIpoloniex(object):		       
-	def __init__(self,APIKey,secret,timeOutSec=3.0):
+	def __init__(self, APIKey, secret, timeOutSec = 3.0):
 		"""
 		key = str api key supplied by Poloniex
 		secret = str secret hash supplied by Poloniex
@@ -60,15 +64,16 @@ class APIpoloniex(object):
 		self.YEAR = self.DAY * 365
 		return
 
-	def __APIerror(self,command = 0, info = 0, html = 0):
-		""" Exception for handling poloniex api errors """
-		#print (html.json(),'HTML!!!')
+	def __APIchekError(self,command = 0, info = 0, html = 0):
+		""" Exception for handling poloniex api errors """		
 		if html == 0 :
 			logging.error('\"' + str(command) + '\" : ' + str(info) ) 		
 			return
-		elif 'error' in html.text:			
+		if 'error' in html.text:			
 			logging.error('\"' + str(command) + '\" : ' + html.text ) 	
-			return -1	
+			return -1		
+		if command in ['buy','sell'] : 
+			logging.error('\"' + str(command) + '\" : ' + html.text ) 	
 		return html.json()
 
 	def CommandPublic (self, command, args={}, timeOutSec=False):
@@ -87,10 +92,10 @@ class APIpoloniex(object):
 		try:
 			html = requests.get(url,timeout=(timeOutSec,timeOutSec))
 		except:
-			self.__APIerror(command = command, info = sys.exc_info()[1])
+			self.__APIchekError(command = command, info = sys.exc_info()[1])
 			return -1
 		else :
-			return self.__APIerror(command = command, html =html)
+			return self.__APIchekError(command = command, html =html)
 
 	def CommandPrivate(self,command ,args={},timeOutSec=False):
 		""" Handler for private commands
@@ -113,10 +118,10 @@ class APIpoloniex(object):
 		try:
 			html = requests.post(url, data=args, headers=headers,timeout=(timeOutSec, timeOutSec))
 		except:
-			self.__APIerror(command = command, info = sys.exc_info()[1])
+			self.__APIchekError(command = command, info = sys.exc_info()[1])
 			return -1	
 		else:				 
-			return  self.__APIerror(command = command, html = html)
+			return  self.__APIchekError(command = command, html = html)
 
 # --PUBLIC COMMANDS-------------------------------------------------------
 
@@ -185,7 +190,7 @@ class APIpoloniex(object):
 # --PRIVATE COMMANDS------------------------------------------------------
 
 	def returnBalances(self, timeOutSec = False):				
-		"""Returns all of your available balances. 
+		""" Returns all of your available balances. 
 		Sample output: 
 		{"BTC":"0.59098578","LTC":"3.31117268", ... } """
 		return self.CommandPrivate('returnBalances', timeOutSec = timeOutSec)
