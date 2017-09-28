@@ -3,7 +3,7 @@ Script for working in API poloniex
 ```python
 from APIpoloniex import *
 polo = APIpoloniex('APIKey', 'Secret', 3.0)
-print (polo.returnBalances()['BTC_LTC'])
+print (polo.returnBalances()['BTC'])
 ```
 
 >in English
